@@ -3,4 +3,6 @@
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [org.clojure/clojure-contrib "1.2.0"]
                  [net.sourceforge.htmlunit/htmlunit "2.8"]]
-  :repositories {"sonatype" "https://oss.sonatype.org/content/repositories/releases/"})
+  :main litberator
+  :repositories {"sonatype" "https://oss.sonatype.org/content/repositories/releases/"}
+  :shell-wrapper true)
