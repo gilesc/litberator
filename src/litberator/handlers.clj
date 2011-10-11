@@ -41,21 +41,6 @@
   (url-to-stream 
    (URL. (str (str url) postfix))))
 
-(defnk hyphenate-url-pdf-stream [url :prefix nil]
-  "Transforms http://HOST/year/other/identifiers/ into
-   http://HOST/content/pdf/[optional prefix]-year-other-identifiers.pdf"
-  (url-to-stream
-   (URL.
-    (string/join "/"
-                 ["http:/"
-                  (.getHost url)
-                  "content/pdf"
-                  (str
-                   (if prefix
-                     (str prefix "-"))
-                   (.replace (apply str (rest (.getPath url))) "/" "-")
-                   ".pdf")]))))
-
 (defn doi-pdf-stream [article]
   "For sites whose PDFs are named directly after DOIs."
   (url-to-stream
@@ -80,7 +65,7 @@
 
 (defmethod pdf-stream* "springerlink.com" [article]
   (url-postfix-pdf-stream (:url article)
-                          :postfix "fulltext.pdf"))
+                          :postfix "fulltext.pdf")) ;;TODO: not working
 
 
 (defmethod pdf-stream* "sciencedirect.com" [article]
@@ -108,12 +93,9 @@
 (defmethod pdf-stream* "genomebiology.com" [article]
   (doi-pdf-stream article))
 
-
-
 (defn pdf-stream [article]
   ;;TODO: perhaps other ways of getting URL
   (if-let [url (follow-doi (:doi article))]
     (pdf-stream*
        (assoc article :url url))))
-
 
