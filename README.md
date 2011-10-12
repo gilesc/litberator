@@ -16,6 +16,7 @@ your system's package manager.
 2. Ensure ~/.lein/bin is on your $PATH.
 
 3. 
+
          lein install litberator
 
 ## Usage
@@ -29,12 +30,14 @@ OR
        cat accessions.txt | litberator $ACCESSION_TYPE [FLAGS] target-directory
 
 $ACCESSION_TYPE can be:
+
 * doi 
 * pmid
 * bibtex
 * query
 
 Flags are:
+
 * -n, Max number of PDFs retrieved.
 
 Highly recommended in conjunction with the "query" accession type. By
