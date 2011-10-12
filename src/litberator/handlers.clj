@@ -51,14 +51,50 @@
                   "content/pdf"
                   (str (doi-suffix (:doi article)) ".pdf")]))))
 
+(defn plos-doi-pdf-stream [doi]
+  "PLOS journals all have a direct doi access to the PDF (neat)"
+  (url-to-stream
+   (URL. (str "http://dx.plos.org/" doi ".pdf"))))
 
 (def pdf-stream* nil)
 (defmulti pdf-stream*
   (fn [article]
-    (host-root (:url article)))
+    (let [root (host-root (:url article))]
+      (if (.startsWith root "plos") :plos
+          root)))
   :default nil)
 
-(defmethod pdf-stream* nil [_])
+(defmethod pdf-stream* "doi.org" [_] nil)
+
+(defmethod pdf-stream* nil [article]
+  (println "NO DISPATCH FOR " (host-root (:url article)) "( " (:doi article) " )"))
+
+(defmethod pdf-stream* :plos [article]
+  (plos-doi-pdf-stream (:doi article)))
+
+(defmethod pdf-stream* "sgmjournals.org" [article]
+  (url-postfix-pdf-stream (:url article)))
+
+(defmethod pdf-stream* "wiley.com" [article]
+  (without-js
+   (let [start (substitute (str (:url article)) {"abstract" "pdf"})
+         page (.getPage client start)]
+     (url-to-stream
+      (URL. (.getAttribute (.getElementById page "pdfDocument") "src"))))))
+
+(defmethod pdf-stream* "acs.org" [article]
+  (substitute (str (:url article)) {"doi" "pdf"}))
+
+(defmethod pdf-stream* "asm.org" [article]
+  (url-postfix-pdf-stream
+   (substitute (str (:url article)) "content/abstract" "reprint")
+   ".pdf"))
+
+(defmethod pdf-stream* "mcponline.org" [article]
+  (url-postfix-pdf-stream (:url article)))
+
+(defmethod pdf-stream* "aacrjournals.org" [article]
+  (url-postfix-pdf-stream (:url article)))
 
 (defmethod pdf-stream* "oxfordjournals.org" [article] ;;oxfordjournals
   (url-postfix-pdf-stream (:url article)))
@@ -67,6 +103,11 @@
   (url-postfix-pdf-stream (:url article)
                           :postfix "fulltext.pdf")) ;;TODO: not working
 
+(defmethod pdf-stream* "cshlp.org" [article]
+  (url-postfix-pdf-stream (:url article)))
+
+(defmethod pdf-stream* "bmj.com" [article]
+  (url-postfix-pdf-stream (:url article)))
 
 (defmethod pdf-stream* "sciencedirect.com" [article]
   (without-js
@@ -75,6 +116,9 @@
      (.getInputStream
       (.openConnection
        (URL. (.getAttribute (.getElementById page "pdfLink") "pdfurl")))))))
+
+(defmethod pdf-stream* "physiology.org" [article]
+  (url-postfix-pdf-stream (:url article)))
 
 (defmethod pdf-stream* "biomedcentral.com" [article]
   (doi-pdf-stream article))

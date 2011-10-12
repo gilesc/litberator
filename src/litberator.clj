@@ -17,7 +17,9 @@
 
 (defn download-article [article target-dir]
   (if-let [strm (handlers/pdf-stream article)]
-    (let [target (or (:title article) (:doi article))]
+    (let [target (if (:title article)
+                   (str (:year article "0000") " -- "(:title article))
+                   (:doi article))]
       (download strm
                 (File. target-dir (.replace (str target ".pdf") "/" "-")))
       (println target " successfully downloaded."))))
