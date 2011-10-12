@@ -1,0 +1,8 @@
+oxfordjournals.org
+springerlink.com
+sciencedirect.com
+biomedcentral.com
+nature.com
+sciencemag.org
+pnas.org
+genomebiology.com

@@ -8,7 +8,7 @@
   (:require
    [clojure.contrib.string :as string]))
 
-(def client (WebClient. BrowserVersion/FIREFOX_3_6))
+(def client nil)
 (HttpURLConnection/setFollowRedirects true)
 
 (import 'org.apache.commons.logging.LogFactory)
@@ -95,7 +95,8 @@
 
 (defn pdf-stream [article]
   ;;TODO: perhaps other ways of getting URL
-  (if-let [url (follow-doi (:doi article))]
-    (pdf-stream*
-       (assoc article :url url))))
+  (binding [client (WebClient. BrowserVersion/FIREFOX_3_6)]
+   (if-let [url (follow-doi (:doi article))]
+     (pdf-stream*
+      (assoc article :url url)))))
 
