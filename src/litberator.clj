@@ -3,7 +3,7 @@
    [java.nio.channels Channels]
    [java.io FileOutputStream File BufferedReader])
   (:require
-   [litberator.bibtex :as bibtex]
+   [litberator.pubmed :as pubmed]
    [litberator.handlers :as handlers]
    [clojure.contrib.io :as io])
   (:use
@@ -38,26 +38,16 @@
    "USAGE: TODO")
   (System/exit 1))
 
-(defn query [qry target n]
-  (println "NOT IMPLEMENTED"))
-(defn pmid [lines target n]
-  (println "NOT IMPLEMENTED"))
-(defn doi [lines target n]
-  (println "NOT IMPLEMENTED"))
-(defn bibtex [lines target n]
-  (let [articles (bibtex/read-bibtex lines)]
-    (download-articles (take n articles) target)))
-
-
 (defn -main [& args]
-  (let [method (resolve (symbol "litberator" (first args)))]
-    (with-command-line (rest args)
-      "XYZ"
-      [[n "Max number of PDFs to download." "50"]
-       remaining]
-      (if (= method query)
-        (apply query remaining [(Integer/parseInt n)])
-        (case (count remaining)
-          1 (method (line-seq (BufferedReader. *in*)) (first remaining) (Integer/parseInt n))
-          2 (method (io/read-lines (first remaining)) (second remaining) (Integer/parseInt n))
-          :default (usage))))))
+  (with-command-line args
+    "XYZ"
+    [[n "Max number of PDFs to download." "50"]
+     [c? count? "Instead of downloading PDFs, just count and output the number of PDFs that would be downloaded."]
+     remaining]
+    (if-not (= (count remaining) 2)
+      (usage)
+      (let [[qry target] remaining
+            articles (pubmed/query qry :n (Integer/parseInt n))]
+        (if c?
+          (println (count (set (map :doi articles))))
+          (download-articles articles target))))))

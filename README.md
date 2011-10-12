@@ -1,7 +1,13 @@
 # litberator
 
-Download (mostly biomedical) journal PDFs using DOI, PMID, BibTeX or
+Download biomedical journal PDFs by entering a standard
 Pubmed query string as input.
+
+I found existing alternatives to be either [difficult to
+operate](http://code.google.com/p/pdfetch/) or [completely
+nonfunctional on my platform
+(linux)](http://pubget.com/help/firefox_plugin). But if there are
+other alternatives that work well please let me know!
 
 ## Requirements & Installation
 
@@ -13,9 +19,9 @@ be using the internet connection of an institution that has a subscription.
 the Clojure package manager, is installed from the provided link or
 your system's package manager. 
 
-2. Ensure ~/.lein/bin is on your $PATH.
+2. Ensure ~/.lein/bin/ is on your $PATH.
 
-3. 
+3. Run:
 
          lein install litberator
 
@@ -23,21 +29,12 @@ your system's package manager.
 
 Invoke like:
 
-       litberator $ACCESSION_TYPE [FLAGS] accessions.txt target-directory
+       litberator [OPTIONS] query target-directory
 
-OR
+Options are:
 
-       cat accessions.txt | litberator $ACCESSION_TYPE [FLAGS] target-directory
-
-$ACCESSION_TYPE can be:
-
-* doi 
-* pmid
-* bibtex
-* query
-
-Flags are:
-
+* -c, Instead of downloading, just output how many PDFs would be
+  downloaded with the current query.
 * -n, Max number of PDFs retrieved.
 
 Highly recommended in conjunction with the "query" accession type. By
@@ -45,23 +42,42 @@ default the -n is 50 for "query" and unlimited for the other accession types.
 
 ## Examples
 
-        echo -e "123456\n123457\n123458" | litberator pmid /home/me/
+        litberator -n 75 "breast cancer" .
 
-        echo -e "10.1126/science.1133420" | litberator doi /my/directory/
+would download the 75 most current articles with "breast cancer" in
+the title, abstract, MeSH terms, etc.
 
-The syntax for "litberator query" is slightly different:
+litberator also supports any of the boolean keys, advanced queries,
+etc, that PubMed does (see
+[here](http://www.ncbi.nlm.nih.gov/books/NBK3827/) for a full
+listing). For example,
 
-    litberator query -n 75 "breast cancer" /my/directory/
+          litberator "Giles CB[AU]" ~/Desktop/
 
-## Journals & Repositories Supported
+would download all my papers onto your desktop.  Unfortunately, this
+example wouldn't exactly fill your desktop up, but with more senior
+authors it would be wise to supply a download limit with -n !
+
+You can also see before initiating the download how many PDFs WOULD be
+downloaded by using the -c flag.
+
+           litberator -c "Wren JD[AU] relationship[TIAB]" ~/Desktop/
+           >> 4
+
+Note that this number may be smaller than the number of results you'd
+get if you entered the same query into Pubmed, because litberator can
+only retrieve articles with DOIs (generally meaning newer articles).
+           
+## Journals & Repositories Supported 
+
 Can be found in journals.txt . If your journal of interest isn't
-included, raise an issue and I'll be happy to add it!
+included, raise an issue on [my
+Github](https://github.com/gilesc/litberator) 
+and I'll be happy to add it!
 
 ## Future directions
 
-* Accept PMIDs and other accessions instead of just DOIs
-* Get accessions from a PubMed-esque query string (route thru
-  e.g. http://www.bioinformatics.org/texmed/)
+* Allow more options on the output PDF file name
 * Provide a little GUI or web interface
 
 ## License & Disclaimer
@@ -73,6 +89,6 @@ TO BE AUTOMATICALLY DOWNLOADED. ABOVE ALL, I WOULD CAUTION AGAINST BEING
 [IDEALISTIC/STUPID](http://articles.boston.com/2011-07-20/news/29795246_1_computer-fraud-computer-security-download)
 AND TRYING TO DOWNLOAD THOUSANDS OF ARTICLES AT ONCE. ALTHOUGH THE
 CURRENT STATE OF ACADEMIC PUBLISHING IS LAMENTABLE, I AM NOT LIABLE
-FOR ANYTHING THAT HAPPENS TO YOUR OR YOUR INSTITUTION FOR USING THIS PROGRAM.
+FOR ANYTHING THAT HAPPENS TO YOU OR YOUR INSTITUTION FOR USING THIS PROGRAM.
 
 

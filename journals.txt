@@ -6,3 +6,11 @@ nature.com
 sciencemag.org
 pnas.org
 genomebiology.com
+sgmjournals.org
+wiley.com
+acs.org
+mcponline.org
+aacrjournals.org
+cshlp.org
+bmj.com
+physiology.org

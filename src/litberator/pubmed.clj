@@ -8,27 +8,32 @@
    [clojure.contrib.zip-filter.xml :as zf]
    [clojure.contrib.string :as string]))
 
+(defrecord Article [pmid title abstract doi])
+
 (defn- ncbi-query [method & kwargs]
-  (xml-zip
-   (parse
-    (input-stream
-     (format "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/%s.fcgi?db=pubmed&retmode=xml&usehistory=y&%s"
-             (name method)
-             (string/join "&"
-                          (for [[k v] (partition 2 kwargs)]
-                            (str (name k) "=" v))))))))
+  (parse
+   (input-stream
+    (format "http://eutils.ncbi.nlm.nih.gov/entrez/eutils/%s.fcgi?db=pubmed&retmode=xml&usehistory=y&%s"
+            (name method)
+            (string/join "&"
+                         (for [[k v] (partition 2 kwargs)]
+                           (str (name k) "=" v)))))))
 
 
-(defnk esearch [qry :n 10]
-  (let [zipper (ncbi-query :esearch :term qry :retmax n)]
+(defn esearch [qry]
+  (let [zipper (xml-zip (ncbi-query :esearch :term (.replace qry " " "+")))]
     {:env (zf/xml1-> zipper :WebEnv zf/text)
      :key (zf/xml1-> zipper :QueryKey zf/text)}))
 
-(defn efetch [key env]
-  (let [zipper (zf/xml-> (ncbi-query :efetch :query_key key :WebEnv env) :PubmedArticle)]
-    {:t (zf/xml-> zipper :MedlineCitation :Article :ArticleTitle zf/text)
-     :d (zf/xml-> zipper :PubmedData :ArticleIdList :ArticleId (zf/attr= "IdType" "doi") zf/text)}))
+(defn efetch [key env n]
+  (for [citation (:content (ncbi-query :efetch :query_key key :WebEnv env :retmax n))
+        :let [zipper (xml-zip citation)
+              article (zf/xml1-> zipper :MedlineCitation :Article)]]
+    (Article. (Integer/parseInt (zf/xml1-> zipper :MedlineCitation :PMID zf/text))
+              (zf/xml1-> article :ArticleTitle zf/text)
+              (zf/xml1-> article :Abstract :AbstractText zf/text)
+              (zf/xml1-> zipper :PubmedData :ArticleIdList :ArticleId (zf/attr= :IdType "doi") zf/text))))
 
-(defn query [qry]
-  (let [env (esearch query)]
-    (efetch env)))
+(defnk query [qry :n 50]
+  (let [{key :key env :env} (esearch qry)]
+    (efetch key env n)))
