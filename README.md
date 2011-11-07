@@ -31,14 +31,13 @@ Invoke like:
 
        litberator [OPTIONS] query target-directory
 
+Or if the target-directory is omitted, it is assumed to be current directory.
+
 Options are:
 
 * -c, Instead of downloading, just output how many PDFs would be
   downloaded with the current query.
-* -n, Max number of PDFs retrieved.
-
-Highly recommended in conjunction with the "query" accession type. By
-default the -n is 50 for "query" and unlimited for the other accession types.
+* -n, Max number of PDFs retrieved. Default 50.
 
 ## Examples
 
@@ -77,6 +76,8 @@ and I'll be happy to add it!
 
 ## Future directions
 
+* Strip off extra period on the end of output file names.
+* Search Google filetype:pdf when normal methods fail (useful for ieee)
 * Allow more options on the output PDF file name
 * Provide a little GUI or web interface
 

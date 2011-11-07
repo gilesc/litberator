@@ -8,7 +8,7 @@
    [clojure.contrib.zip-filter.xml :as zf]
    [clojure.contrib.string :as string]))
 
-(defrecord Article [pmid title abstract doi])
+(defrecord Article [pmid year title abstract doi])
 
 (defn- ncbi-query [method & kwargs]
   (parse
@@ -30,6 +30,8 @@
         :let [zipper (xml-zip citation)
               article (zf/xml1-> zipper :MedlineCitation :Article)]]
     (Article. (Integer/parseInt (zf/xml1-> zipper :MedlineCitation :PMID zf/text))
+              (if-let [year (zf/xml1-> article :Journal :JournalIssue :PubDate :Year zf/text)]
+                (Integer/parseInt year))
               (zf/xml1-> article :ArticleTitle zf/text)
               (zf/xml1-> article :Abstract :AbstractText zf/text)
               (zf/xml1-> zipper :PubmedData :ArticleIdList :ArticleId (zf/attr= :IdType "doi") zf/text))))

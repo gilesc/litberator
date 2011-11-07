@@ -137,6 +137,18 @@
 (defmethod pdf-stream* "genomebiology.com" [article]
   (doi-pdf-stream article))
 
+(defmethod pdf-stream* "jneurosci.org" [article]
+  (url-postfix-pdf-stream article))
+
+(defmethod pdf-stream* "jbc.org" [article]
+  (url-postfix-pdf-stream article))
+
+(defmethod pdf-stream* "plantcell.org" [article]
+  (url-postfix-pdf-stream article))
+
+(defmethod pdf-stream* "plantphysiol.org" [article]
+  (url-postfix-pdf-stream article))
+
 (defn pdf-stream [article]
   ;;TODO: perhaps other ways of getting URL
   (binding [client (WebClient. BrowserVersion/FIREFOX_3_6)]
