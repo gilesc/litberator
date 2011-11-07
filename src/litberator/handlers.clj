@@ -138,16 +138,25 @@
   (doi-pdf-stream article))
 
 (defmethod pdf-stream* "jneurosci.org" [article]
-  (url-postfix-pdf-stream article))
+  (url-postfix-pdf-stream (:url article)))
 
 (defmethod pdf-stream* "jbc.org" [article]
-  (url-postfix-pdf-stream article))
+  (url-postfix-pdf-stream (:url article)))
 
 (defmethod pdf-stream* "plantcell.org" [article]
-  (url-postfix-pdf-stream article))
+  (url-postfix-pdf-stream (:url article)))
 
 (defmethod pdf-stream* "plantphysiol.org" [article]
-  (url-postfix-pdf-stream article))
+  (url-postfix-pdf-stream (:url article)))
+
+(defmethod pdf-stream* "ahajournals.org" [article]
+  (url-postfix-pdf-stream (:url article)))
+
+(defmethod pdf-stream* "endojournals.org" [article]
+  (url-postfix-pdf-stream (:url article)))
+
+(defmethod pdf-stream* "aspetjournals.org" [article]
+  (url-postfix-pdf-stream (:url article)))
 
 (defn pdf-stream [article]
   ;;TODO: perhaps other ways of getting URL
