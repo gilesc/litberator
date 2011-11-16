@@ -82,6 +82,12 @@
      (url-to-stream
       (URL. (.getAttribute (.getElementById page "pdfDocument") "src"))))))
 
+(defmethod pdf-stream* "jbiomedsem.org" [article]
+  (doi-pdf-stream article))
+
+(defmethod pdf-stream* "biodatamining.org" [article]
+  (doi-pdf-stream article))
+
 (defmethod pdf-stream* "acs.org" [article]
   (substitute (str (:url article)) {"doi" "pdf"}))
 
@@ -142,6 +148,12 @@
 
 (defmethod pdf-stream* "jbc.org" [article]
   (url-postfix-pdf-stream (:url article)))
+
+(defmethod pdf-stream* "jeccr.com" [article]
+  (doi-pdf-stream article))
+
+(defmethod pdf-stream* "jcheminf.com" [article]
+  (doi-pdf-stream article))
 
 (defmethod pdf-stream* "plantcell.org" [article]
   (url-postfix-pdf-stream (:url article)))
