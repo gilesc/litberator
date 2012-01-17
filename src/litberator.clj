@@ -63,10 +63,15 @@
     (binding [*db* (file (:database conf))]
       (let [qry (first remaining)
             articles (pubmed/query qry :n (:n conf))]
-        (dorun (pmap download-article articles))
-        (if-let [target-dir (second remaining)]
-          (doseq [article articles
-                  :let [src (File. *db* (str (:doi article) ".pdf"))]]
-            (copy src
-                  (File. target-dir
-                         (human-readable-file article)))))))))
+        (if (:count conf)
+          (info (min (count articles)
+                     (conf :number))
+                "articles would be downloaded.")
+          (do
+            (dorun (pmap download-article articles))
+            (if-let [target-dir (second remaining)]
+              (doseq [article (take (conf :number) articles)
+                      :let [src (File. *db* (str (:doi article) ".pdf"))]]
+                (copy src
+                      (File. target-dir
+                             (human-readable-file article)))))))))))

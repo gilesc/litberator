@@ -3,7 +3,7 @@
   :dependencies [[org.clojure/clojure "1.3.0"]
                  [org.clojure/clojure-contrib "1.2.0"]
                  [org.clojure/tools.logging "0.2.3"]
-                 [org.clojure/tools.cli "0.2.100]
+                 [org.clojure/tools.cli "0.2.1"]
                  [net.sourceforge.htmlunit/htmlunit "2.8"]]
   :main litberator
   :repositories {"sonatype"
