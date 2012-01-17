@@ -1,21 +1,21 @@
 (ns litberator.handlers
   (:use
-   [litberator doi]
-   clojure.contrib.def)
+   [clojure.tools.logging :only (warn)]
+   [litberator doi])
   (:import
    [java.net HttpURLConnection URL]
-   [com.gargoylesoftware.htmlunit WebClient BrowserVersion])
-  (:require
-   [clojure.contrib.string :as string]))
+   [java.util.logging Level]
+   [org.apache.commons.logging LogFactory]
+   [com.gargoylesoftware.htmlunit WebClient BrowserVersion]))
 
-(def client nil)
+(def ^{:dynamic true} client nil)
+
 (HttpURLConnection/setFollowRedirects true)
 
-(import 'org.apache.commons.logging.LogFactory)
-(import 'java.util.logging.Level)
-
-(.setLevel (.getLogger (LogFactory/getLog "com.gargoylesoftware.htmlunit"))
-           Level/OFF)
+(.setLevel
+ (.getLogger
+  (LogFactory/getLog "com.gargoylesoftware.htmlunit"))
+ Level/OFF)
 
 (defmacro without-js [form]
   `(do
@@ -32,12 +32,17 @@
             (.replace s pattern replace))
           s substitutions))
 
+(defn string-join [sep coll]
+  (apply str
+         (interpose sep coll)))
+
 (defn host-root [url]
-  (string/join "."
+  (string-join "."
                  (take-last 2
                             (.split (.getHost url) "\\."))))
 
-(defnk url-postfix-pdf-stream [url :postfix ".full.pdf"]
+(defn url-postfix-pdf-stream [url &{:keys [postfix]
+                                    :or {postfix ".full.pdf"}}]
   (url-to-stream 
    (URL. (str (str url) postfix))))
 
@@ -45,7 +50,7 @@
   "For sites whose PDFs are named directly after DOIs."
   (url-to-stream
    (URL.
-    (string/join "/"
+    (string-join "/"
                  ["http:/"
                   (.getHost (:url article))
                   "content/pdf"
@@ -67,7 +72,9 @@
 (defmethod pdf-stream* "doi.org" [_] nil)
 
 (defmethod pdf-stream* nil [article]
-  (println "NO DISPATCH FOR " (host-root (:url article)) "( " (:doi article) " )"))
+  (warn "NO DISPATCH FOR "
+        (host-root (:url article))
+        " --- " (:doi article)))
 
 (defmethod pdf-stream* :plos [article]
   (plos-doi-pdf-stream (:doi article)))

@@ -36,6 +36,6 @@
               (zf/xml1-> article :Abstract :AbstractText zf/text)
               (zf/xml1-> zipper :PubmedData :ArticleIdList :ArticleId (zf/attr= :IdType "doi") zf/text))))
 
-(defnk query [qry :n 50]
+(defn query [qry &{:keys [n] :or {n 50}}]
   (let [{key :key env :env} (esearch qry)]
     (efetch key env n)))
